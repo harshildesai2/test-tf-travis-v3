@@ -5,8 +5,19 @@ locals {
 #log Group
 resource "aws_cloudwatch_log_group" "getSubscriptionStatus" {
   name = "/aws/lambda/${local.getSubscriptionStatus_function_name}"
-  retention_in_days = 14
+  retention_in_days = "${var.logs_retention_in_days}"
+
   tags = "${local.required_tags}"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "getSubscriptionStatus" {
+  count           = "${var.kinesis_firehose_delivery_stream_name == "" ? 0 : 1}"
+  name            = "${local.name_prefix}-getSubscriptionStatus-logfilter"
+  role_arn        = "${aws_iam_role.log_subscription.arn}"
+  log_group_name  = "${aws_cloudwatch_log_group.getSubscriptionStatus.name}"
+  destination_arn = "${local.kinesis_firehose_delivery_stream_arn}"
+  distribution    = "ByLogStream"
+  filter_pattern  = ""
 }
 
 #role for lambda execution
@@ -55,9 +66,9 @@ resource "aws_lambda_function" "getSubscriptionStatus" {
   environment {
     variables = {
       AUTH_TYPE = "password"
-      PASSWORD = ""
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = ""
-      USERNAME = "loyalty_API"
+      PASSWORD  = "Lulu%40lem0n"
+      RESPONSYS_AUTH_TOKEN_ENDPOINT = "https://login2.responsys.net/rest/api/v1/auth/token"
+      USERNAME  = "loyalty_API"
       GET_MEMBER_API_URL  = "/rest/api/v1/lists/CONTACTS_LIST/members/"
       GET_FIELD_PARAMS = "EMAIL_ADDRESS_,EMAIL_PERMISSION_STATUS_"
       IS_TRANSFORM_RESPONSE = "true"

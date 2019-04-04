@@ -5,9 +5,19 @@ locals {
 #log Group
 resource "aws_cloudwatch_log_group" "updateSubscriber" {
   name = "/aws/lambda/${local.updateSubscriber_function_name}"
-  retention_in_days = 14
+  retention_in_days = "${var.logs_retention_in_days}"
 
   tags = "${local.required_tags}"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "updateSubscriber" {
+  count           = "${var.kinesis_firehose_delivery_stream_name == "" ? 0 : 1}"
+  name            = "${local.name_prefix}-updateSubscriber-logfilter"
+  role_arn        = "${aws_iam_role.log_subscription.arn}"
+  log_group_name  = "${aws_cloudwatch_log_group.updateSubscriber.name}"
+  destination_arn = "${local.kinesis_firehose_delivery_stream_arn}"
+  distribution    = "ByLogStream"
+  filter_pattern  = ""
 }
 
 #role for lambda execution
@@ -56,8 +66,8 @@ resource "aws_lambda_function" "updateSubscriber" {
   environment {
     variables = {
       AUTH_TYPE = "password"
-      PASSWORD  = ""
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = ""
+      PASSWORD  = "Lulu%40lem0n"
+      RESPONSYS_AUTH_TOKEN_ENDPOINT = "https://login2.responsys.net/rest/api/v1/auth/token"
       USERNAME  = "loyalty_API"
       UPDATE_API_URL  = "/rest/api/v1/lists/CONTACTS_LIST/members"
       MERGE_RULE_JSON = "{ \"htmlValue\" : \"H\", \"optinValue\" : \"Y\", \"textValue\" : \"T\", \"insertOnNoMatch\" : true, \"updateOnMatch\" : \"REPLACE_ALL\", \"matchColumnName1\" : \"email_address_\", \"matchOperator\" : \"NONE\", \"optoutValue\" : \"N\", \"rejectRecordIfChannelEmpty\" : \"\", \"defaultPermissionStatus\" : \"OPTIN\" }"

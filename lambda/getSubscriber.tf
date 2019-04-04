@@ -5,9 +5,19 @@ locals {
 #log Group
 resource "aws_cloudwatch_log_group" "getSubscriber" {
   name = "/aws/lambda/${local.getSubscriber_function_name}"
-  retention_in_days = 14
+  retention_in_days = "${var.logs_retention_in_days}"
 
   tags = "${local.required_tags}"
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "getSubscriber" {
+  count           = "${var.kinesis_firehose_delivery_stream_name == "" ? 0 : 1}"
+  name            = "${local.name_prefix}-getSubscriber-logfilter"
+  role_arn        = "${aws_iam_role.log_subscription.arn}"
+  log_group_name  = "${aws_cloudwatch_log_group.getSubscriber.name}"
+  destination_arn = "${local.kinesis_firehose_delivery_stream_arn}"
+  distribution    = "ByLogStream"
+  filter_pattern  = ""
 }
 
 #role for lambda execution
@@ -55,10 +65,11 @@ resource "aws_lambda_function" "getSubscriber" {
 
   environment {
     variables = {
-      AUTH_TYPE = "password"
-      PASSWORD = "${var.api_password}"
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = "${var.api_endpoint}"
-      USERNAME = "loyalty_API"
+      LOGIN_ENDPOINT = "${local.apigw_domain_name}/login"
+      LOGIN_SECRET_KEY = "${var.login_secretkey}"
+      LOGIN_ACCESS_KEY = "${var.login_accesskey}"
+      LOGIN_REGION = "${var.env_region}"
+      LOGIN_SERVICE = "execute-api"
       GET_MEMBER_API_URL  = "/rest/api/v1/lists/CONTACTS_LIST/members/"
       GET_FIELD_PARAMS = "EMAIL_ADDRESS_,COUNTRY_,PRODUCT_GENDER,PRODUCT_ACTIVITIES,RIID_,EMAIL_PERMISSION_STATUS_"
       IS_TRANSFORM_RESPONSE = "false"

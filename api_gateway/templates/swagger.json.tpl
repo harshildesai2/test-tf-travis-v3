@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "consent-management-${env_name}",
-    "version": "2019-01-11T23:09:00Z"
+    "description": "Consent management responsys API"
   },
   "servers": [
     {
@@ -15,6 +15,26 @@
     }
   ],
   "paths": {
+    "/login": {
+      "post": {
+        "security": [
+          {
+            "sigv4": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "uri": "${login_invoke_arn}",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      }
+    },
     "/getsubscriberinfo": {
       "post": {
         "security": [
@@ -96,9 +116,29 @@
         },
         "Action": "execute-api:Invoke",
         "Resource": [
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/getsubscriberinfo",
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/getsubscriptionstatus",
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/updatesubscriberinfo"
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus",
+          "arn:aws:execute-api:${region}:*:*/*/POST/updatesubscriberinfo"
+        ]
+      },
+      {
+          "Effect": "Allow",
+          "Principal": {
+              "AWS": "${apiexecution_user_arn_login}"
+          },
+          "Action": "execute-api:Invoke,InvalidateCache",
+          "Resource": "arn:aws:execute-api:${region}:*:*/*/POST/login"
+      },
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "${apiexecution_user_arn_mobile}"
+        },
+        "Action": "execute-api:Invoke",
+        "Resource": [
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus",
+          "arn:aws:execute-api:${region}:*:*/*/POST/updatesubscriberinfo"
         ]
       }
     ]
