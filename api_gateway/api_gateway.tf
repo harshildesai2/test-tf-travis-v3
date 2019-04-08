@@ -25,11 +25,14 @@ data "aws_iam_policy_document" "consent_mgt_rest_api" {
     ]
     principals {
       type = "AWS"
-      identifiers = ["${aws_iam_user.api_execution.arn}"]
+      identifiers = [
+        "${aws_iam_user.api_execution.arn}",
+        "${aws_iam_user.api_execution_mobile.arn}"
+      ]
     }
   }
   statement {
-    actions   = ["execute-api:Invoke,InvalidateCache"]
+    actions   = ["execute-api:*"]
     resources = [
       "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/login"
     ]
@@ -40,15 +43,15 @@ data "aws_iam_policy_document" "consent_mgt_rest_api" {
   }
   statement {
     actions   = ["execute-api:Invoke"]
-    resources = [
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/getsubscriberinfo",
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/getsubscriptionstatus",
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/updatesubscriberinfo"
-    ]
     principals {
-      type = "AWS"
-      identifiers = ["${aws_iam_user.api_execution_mobile.arn}"]
+        type = "AWS"
+        identifiers = ["*"]
     }
+    resources = [
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/getsubscriberinfo",
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/getsubscriptionstatus",
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/updatesubscriberinfo"
+    ]
   }
 }
 
@@ -86,6 +89,7 @@ resource "aws_api_gateway_stage" "v1" {
   cache_cluster_enabled = true
   cache_cluster_size = "0.5"
 }
+
 
 # method setting for LOGIN api-gateway resources
 resource "aws_api_gateway_method_settings" "login" {

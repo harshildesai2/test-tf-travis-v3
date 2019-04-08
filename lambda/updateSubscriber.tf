@@ -65,12 +65,13 @@ resource "aws_lambda_function" "updateSubscriber" {
 
   environment {
     variables = {
-      AUTH_TYPE = "password"
-      PASSWORD  = "Lulu%40lem0n"
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = "https://login2.responsys.net/rest/api/v1/auth/token"
-      USERNAME  = "loyalty_API"
-      UPDATE_API_URL  = "/rest/api/v1/lists/CONTACTS_LIST/members"
-      MERGE_RULE_JSON = "{ \"htmlValue\" : \"H\", \"optinValue\" : \"Y\", \"textValue\" : \"T\", \"insertOnNoMatch\" : true, \"updateOnMatch\" : \"REPLACE_ALL\", \"matchColumnName1\" : \"email_address_\", \"matchOperator\" : \"NONE\", \"optoutValue\" : \"N\", \"rejectRecordIfChannelEmpty\" : \"\", \"defaultPermissionStatus\" : \"OPTIN\" }"
+      LOGIN_ENDPOINT    = "${local.apigw_domain_name}/login"
+      LOGIN_SECRET_KEY  = "${var.login_secretkey}"
+      LOGIN_ACCESS_KEY  = "${var.login_accesskey}"
+      LOGIN_REGION      = "${var.env_region}"
+      LOGIN_SERVICE     = "execute-api"
+      UPDATE_API_URL    = "/rest/api/v1/lists/CONTACTS_LIST/members"
+      MERGE_RULE_JSON   = "{ \"htmlValue\" : \"H\", \"optinValue\" : \"Y\", \"textValue\" : \"T\", \"insertOnNoMatch\" : true, \"updateOnMatch\" : \"REPLACE_ALL\", \"matchColumnName1\" : \"email_address_\", \"matchOperator\" : \"NONE\", \"optoutValue\" : \"N\", \"rejectRecordIfChannelEmpty\" : \"\", \"defaultPermissionStatus\" : \"OPTIN\" }"
     }
   }
 

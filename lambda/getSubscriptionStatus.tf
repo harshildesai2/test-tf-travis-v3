@@ -65,12 +65,13 @@ resource "aws_lambda_function" "getSubscriptionStatus" {
 
   environment {
     variables = {
-      AUTH_TYPE = "password"
-      PASSWORD  = "Lulu%40lem0n"
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = "https://login2.responsys.net/rest/api/v1/auth/token"
-      USERNAME  = "loyalty_API"
-      GET_MEMBER_API_URL  = "/rest/api/v1/lists/CONTACTS_LIST/members/"
-      GET_FIELD_PARAMS = "EMAIL_ADDRESS_,EMAIL_PERMISSION_STATUS_"
+      LOGIN_ENDPOINT        = "${local.apigw_domain_name}/login"
+      LOGIN_SECRET_KEY      = "${var.login_secretkey}"
+      LOGIN_ACCESS_KEY      = "${var.login_accesskey}"
+      LOGIN_REGION          = "${var.env_region}"
+      LOGIN_SERVICE         = "execute-api"
+      GET_MEMBER_API_URL    = "/rest/api/v1/lists/CONTACTS_LIST/members/"
+      GET_FIELD_PARAMS      = "EMAIL_ADDRESS_,EMAIL_PERMISSION_STATUS_"
       IS_TRANSFORM_RESPONSE = "true"
     }
   }

@@ -53,6 +53,48 @@
             }
           }
         }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
+        }
       }
     },
     "/getsubscriptionstatus": {
@@ -73,6 +115,48 @@
             }
           }
         }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
+        }
       }
     },
     "/updatesubscriberinfo": {
@@ -92,6 +176,48 @@
               "statusCode": "200"
             }
           }
+        }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
         }
       }
     }
@@ -126,7 +252,7 @@
           "Principal": {
               "AWS": "${apiexecution_user_arn_login}"
           },
-          "Action": "execute-api:Invoke,InvalidateCache",
+          "Action": "execute-api:*",
           "Resource": "arn:aws:execute-api:${region}:*:*/*/POST/login"
       },
       {
@@ -139,6 +265,16 @@
           "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
           "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus",
           "arn:aws:execute-api:${region}:*:*/*/POST/updatesubscriberinfo"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "execute-api:*",
+        "Resource": [
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriberinfo",
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriptionstatus",
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/updatesubscriberinfo"
         ]
       }
     ]
