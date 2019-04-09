@@ -40,6 +40,9 @@
         "security": [
           {
             "sigv4": []
+          },
+          {
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
@@ -102,6 +105,9 @@
         "security": [
           {
             "sigv4": []
+          },
+          {
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
@@ -164,6 +170,9 @@
         "security": [
           {
             "sigv4": []
+          },
+          {
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
@@ -224,6 +233,11 @@
   },
   "components": {
     "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header"
+      },
       "sigv4": {
         "type": "apiKey",
         "name": "Authorization",
@@ -254,18 +268,6 @@
           },
           "Action": "execute-api:*",
           "Resource": "arn:aws:execute-api:${region}:*:*/*/POST/login"
-      },
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "${apiexecution_user_arn_mobile}"
-        },
-        "Action": "execute-api:Invoke",
-        "Resource": [
-          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
-          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus",
-          "arn:aws:execute-api:${region}:*:*/*/POST/updatesubscriberinfo"
-        ]
       },
       {
         "Effect": "Allow",

@@ -47,3 +47,12 @@ module "api_gateway" {
   
   required_tags = "${local.required_tags}"
 }
+
+module "usage_plan" {
+
+  source      = "usage_plan"
+  env_name    = "${lower(var.env_name)}"
+  stage_name  = "${module.api_gateway.stage_name}"
+  api_resource_id = "${module.api_gateway.api_resource_id}"
+
+}

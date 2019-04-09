@@ -11,7 +11,6 @@ data "template_file" "swagger_template" {
     updateSubscriber_invoke_arn = "${var.updateSubscriber_invoke_arn}"
     apiexecution_user_arn = "${aws_iam_user.api_execution.arn}"
     apiexecution_user_arn_login = "${aws_iam_user.api_execution_login.arn}"
-    apiexecution_user_arn_mobile = "${aws_iam_user.api_execution_mobile.arn}"
   }
 }
 
@@ -26,8 +25,7 @@ data "aws_iam_policy_document" "consent_mgt_rest_api" {
     principals {
       type = "AWS"
       identifiers = [
-        "${aws_iam_user.api_execution.arn}",
-        "${aws_iam_user.api_execution_mobile.arn}"
+        "${aws_iam_user.api_execution.arn}"
       ]
     }
   }
@@ -103,7 +101,7 @@ resource "aws_api_gateway_method_settings" "login" {
     metrics_enabled = true
     logging_level   = "INFO"
     caching_enabled = true
-    cache_ttl_in_seconds  = 300
+    cache_ttl_in_seconds  = 3600
   }
 }
 
@@ -143,7 +141,7 @@ resource "aws_lambda_permission" "apig_updateSubscriber" {
   source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
 }
 
-#iam user for executing the api -----------------------------------
+#iam user for executing the api 
 resource "aws_iam_user" "api_execution" {
   name = "${local.name_prefix}-apigw-user"
   path = "/${local.name_prefix}/"
@@ -168,7 +166,7 @@ resource "aws_iam_user_policy_attachment" "api_execution" {
   policy_arn = "${aws_iam_policy.api_execution.arn}"
 }
 
-#iam user for executing the api for login API -----------------------------------
+#iam user for executing the api for login API 
 resource "aws_iam_user" "api_execution_login" {
   name = "${local.name_prefix}-apigw-user-login"
   path = "/${local.name_prefix}/"
@@ -196,16 +194,4 @@ resource "aws_iam_user_policy_attachment" "api_execution_login" {
 #Generating keys for the Login resource
 resource "aws_iam_access_key" "key_login" {
   user    = "${aws_iam_user.api_execution_login.name}"
-}
-
-#iam user for executing the api for Mobile client -----------------------------------
-resource "aws_iam_user" "api_execution_mobile" {
-  name = "${local.name_prefix}-apigw-user-mobile"
-  path = "/${local.name_prefix}/"
-}
-
-#attaching policy to the user
-resource "aws_iam_user_policy_attachment" "api_execution_mobile" {
-  user = "${aws_iam_user.api_execution_mobile.name}"
-  policy_arn = "${aws_iam_policy.api_execution.arn}"
 }
