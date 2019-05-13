@@ -2,8 +2,8 @@ variable "env_name" {
   description = "Environment name [dev, qa14,qa16, stage, prod]"
 }
 
-variable "env_region" {
-  description = "aws_region"
+variable "queue_name" {
+  description = "Name of the FIFO queue for posting the subscription messages"
 }
 
 variable "login_invoke_arn" {
@@ -18,10 +18,6 @@ variable "getSubscriptionStatus_invoke_arn" {
   description = "aws_lambda_function.getSubscriptionStatus.invoke_"
 }
 
-variable "updateSubscriber_invoke_arn" {
-  description = "aws_lambda_function.updateSubscriber.invoke_"
-}
-
 variable "login_arn" {
   description = "aws_lambda_function.login."
 }
@@ -34,8 +30,8 @@ variable "getSubscriptionStatus_arn" {
   description = "aws_lambda_function.getSubscriptionStatus."
 }
 
-variable "updateSubscriber_arn" {
-  description = "aws_lambda_function.updateSubscriber."
+variable "subscriber_queue_arn" {
+  description = "arn for the FIFO SQS queue where subscriber messages are stored."
 }
 
 variable "logs_retention_in_days" {

@@ -12,3 +12,5 @@ Project has following modules
     This module contains scripts to build API gateway
 3. usage_plan
     This module contains scripts to build usage plan for the API resources
+4. queue
+    This module contains scripts to build FIFO SQS queue for storing the update subsriber messages

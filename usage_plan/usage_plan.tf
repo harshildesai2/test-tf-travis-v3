@@ -1,7 +1,6 @@
 resource "aws_api_gateway_usage_plan" "api_usage_plan" {
-
-  name        = "consent_mgt_usage_plan"
-  description = "The usage plan for the consent management api resources"
+  name        = "${local.name_prefix}-usage-plan"
+  description = "The usage plan for the Consent Management API resources"
 
   api_stages {
     api_id = "${var.api_resource_id}"
@@ -9,13 +8,13 @@ resource "aws_api_gateway_usage_plan" "api_usage_plan" {
   }
 
   throttle_settings {
-    burst_limit = 5000
-    rate_limit  = 10000
+    burst_limit = "${var.burst_limit}"
+    rate_limit  = "${var.rate_limit}"
   }
 }
 
 resource "aws_api_gateway_api_key" "webkey" {
-  name = "web_key"
+  name = "${local.name_prefix}-web-key"
 }
 
 resource "aws_api_gateway_usage_plan_key" "webkey_plan" {
@@ -45,23 +44,13 @@ data "template_file" "install_script" {
   EOF
 }
 
-#defining method throttling limits
-variable "method_throttling" {
-  type        = "list"
-  description = "example method throttling"
-  default     = [
-    "\\\"/getsubscriberinfo/POST\\\":{\\\"rateLimit\\\":30,\\\"burstLimit\\\":25}",
-    "\\\"/getsubscriptionstatus/POST\\\":{\\\"rateLimit\\\":30,\\\"burstLimit\\\":25}"
-  ]
-}
-
 # locals
 locals {
   # Delimiter for later usage
   delimiter      = "'"
 
   # Base aws cli command
-  base_command   = " apigateway update-usage-plan --usage-plan-id ${aws_api_gateway_usage_plan.api_usage_plan.id} --patch-operations op"
+  base_command   = "apigateway update-usage-plan --usage-plan-id ${aws_api_gateway_usage_plan.api_usage_plan.id} --patch-operations op"
 
   # Later aws cli command
   base_path      = "path=/apiStages/${var.api_resource_id}:${var.stage_name}/throttle,value"
@@ -69,37 +58,37 @@ locals {
   # Join method throttling variable to string
   methods_string = "${local.delimiter}\"{${join(",", var.method_throttling)}}\"${local.delimiter}"
 
-  #create command
+  # create command
   create_command = "${local.base_command}=add,${local.base_path}=${local.methods_string}"
 
-  #edit command
+  # edit command
   edit_command = "${local.base_command}=replace,${local.base_path}=${local.methods_string}"
 
-  #delete command
-  delete_command = "${local.base_command}=remove,${local.base_path}="  
+  # delete command
+  delete_command = "${local.base_command}=remove,${local.base_path}="
 
-  #rendered CLI
+  # rendered CLI
   cli_rendered = "${data.template_file.install_script.rendered}"
 }
 
 data "template_file" "create" {
   template = <<EOF
   ${local.cli_rendered}
-  "$AWSCLI_PATH"/${local.create_command}
+  "$AWSCLI_PATH" ${local.create_command}
   EOF
 }
 
 data "template_file" "edit" {
   template = <<EOF
   ${local.cli_rendered}
-  "$AWSCLI_PATH"/${local.edit_command}
+  "$AWSCLI_PATH" ${local.edit_command}
   EOF
 }
 
 data "template_file" "destroy" {
   template = <<EOF
   ${local.cli_rendered}
-  "$AWSCLI_PATH"/${local.delete_command}
+  "$AWSCLI_PATH" ${local.delete_command}
   EOF
 }
 
@@ -109,26 +98,26 @@ resource "null_resource" "method_throttling" {
   # create method throttling
   provisioner "local-exec" {
     when       = "create"
-    command = "${data.template_file.create.rendered}"
+    command    = "${data.template_file.create.rendered}"
     on_failure = "continue"
   }
 
   # edit method throttling
   provisioner "local-exec" {
-    command = "${data.template_file.edit.rendered}"
+    command    = "${data.template_file.edit.rendered}"
     on_failure = "fail"
-  }  
+  }
 
   # delete method throttling
   provisioner "local-exec" {
-    when    = "destroy"
-    command = "${data.template_file.destroy.rendered}"    
+    when       = "destroy"
+    command    = "${data.template_file.destroy.rendered}"
     on_failure = "fail"
   }
 
   triggers = {
-    usage_plan_change  = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
-    methods_change     = "${local.methods_string}"
+    usage_plan_change = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
+    methods_change    = "${local.methods_string}"
   }
 
   depends_on = [

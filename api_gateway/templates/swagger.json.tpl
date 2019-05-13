@@ -33,10 +33,37 @@
             }
           }
         }
+      },
+      "options": {
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
+        }
       }
     },
     "/getsubscriberinfo": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
         "security": [
           {
             "sigv4": []
@@ -52,7 +79,10 @@
           "type": "aws_proxy",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
           }
         }
@@ -102,6 +132,19 @@
     },
     "/getsubscriptionstatus": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
         "security": [
           {
             "sigv4": []
@@ -117,7 +160,10 @@
           "type": "aws_proxy",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
           }
         }
@@ -165,26 +211,46 @@
         }
       }
     },
-    "/updatesubscriberinfo": {
+    "/sendsubscriberupdate": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
         "security": [
-          {
-            "sigv4": []
-          },
           {
             "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
-          "uri": "${updateSubscriber_invoke_arn}",
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "type": "aws_proxy",
+          "credentials": "arn:aws:iam::*:*",
+          "uri": "${fifo_queue_path}",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
-          }
+          },
+          "requestParameters": {
+            "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "requestTemplates": {
+            "application/json": "Action=SendMessage&MessageBody=$util.urlEncode($util.escapeJavaScript($input.json('$')))&MessageGroupId=\"subscribermsggroup\""
+          },
+          "type": "aws"
         }
       },
       "options": {
@@ -222,7 +288,7 @@
               }
             }
           },
-          "passthroughBehavior": "when_no_templates",
+          "passthroughBehavior": "when_no_match",
           "requestTemplates": {
             "application/json": "{\"statusCode\": 200}"
           },
@@ -257,8 +323,7 @@
         "Action": "execute-api:Invoke",
         "Resource": [
           "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
-          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus",
-          "arn:aws:execute-api:${region}:*:*/*/POST/updatesubscriberinfo"
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus"
         ]
       },
       {
@@ -276,7 +341,8 @@
         "Resource": [
           "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriberinfo",
           "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriptionstatus",
-          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/updatesubscriberinfo"
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/sendsubscriberupdate",
+          "arn:aws:execute-api:${region}:*:*/*/POST/sendsubscriberupdate"
         ]
       }
     ]

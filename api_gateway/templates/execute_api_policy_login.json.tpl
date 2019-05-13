@@ -4,7 +4,8 @@
         {
             "Effect": "Allow",
             "Action": [
-                "execute-api:Invoke,InvalidateCache"
+                "execute-api:InvalidateCache",
+                "execute-api:Invoke"
             ],
             "Resource": "arn:aws:execute-api:*:*:*/login"
         }

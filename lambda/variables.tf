@@ -2,10 +2,6 @@ variable "env_name" {
   description = "Environment name [dev, qa14, qa16, stage, prod]"
 }
 
-variable "env_region" {
-  description = "aws_region"
-}
-
 variable "code_bucket" {
   description = "s3 bucket name for code"
 }
@@ -45,12 +41,40 @@ variable "certificate_domain_name" {
   description = "Domain name associated with SSL certificate to be used for API Gateway"
 }
 
-variable "login_secretkey" {
-  description = "key for the login API"
+variable "login_access_key" {
+  description = "Access key for login API"
 }
 
-variable "login_accesskey" {
-  description = "access key for login API"
+variable "login_secret_key" {
+  description = "Secret key for login API"
+}
+
+variable "batch_size" {
+  description = "No of records read per batch. Default: 10"
+  default     = 10
+}
+
+variable "batch_count" {
+  description = "No of batch reads per scheduler execution. Default: 5"
+  default     = 5
+}
+
+variable "wait_time" {
+  description = "Time waited after every batch execution. Default: 10"
+  default     = 10
+}
+
+variable "update_scheduler_run_period" {
+  description = "Scheduler run period in minutes. Default: 1"
+  default     = 1
+}
+
+variable "queue_name" {
+  description = "Name of the FIFO queue that stores Subscription messages"
+}
+
+variable "subscriber_queue_arn" {
+  description = "arn for the FIFO SQS queue where subscriber messages are stored."
 }
 
 locals {

@@ -53,8 +53,9 @@ resource "aws_iam_role_policy_attachment" "login" {
 resource "aws_lambda_function" "login" {
   function_name = "${local.login_function_name}"
 
-  s3_bucket = "${var.code_bucket}"
-  s3_key    = "${var.jar_path}"
+  s3_bucket         = "${data.aws_s3_bucket_object.lambda.bucket}"
+  s3_key            = "${data.aws_s3_bucket_object.lambda.key}"
+  s3_object_version = "${data.aws_s3_bucket_object.lambda.version_id}"
 
   handler = "com.amazonaws.lambda.responsys.LoginHandler::handleRequest"
   role    = "${aws_iam_role.login.arn}"
@@ -66,9 +67,9 @@ resource "aws_lambda_function" "login" {
   environment {
     variables = {
       RESPONSYS_AUTH_TYPE = "password"
-      RESPONSYS_PASSWORD  = "Lulu%40lem0n"
-      RESPONSYS_AUTH_TOKEN_ENDPOINT = "https://login2.responsys.net/rest/api/v1/auth/token"
-      RESPONSYS_USERNAME  = "loyalty_API"
+      RESPONSYS_PASSWORD  = "${var.api_password}"
+      RESPONSYS_AUTH_TOKEN_ENDPOINT = "${var.api_endpoint}"
+      RESPONSYS_USERNAME  = "${var.api_username}"
     }
   }
 

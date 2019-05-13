@@ -53,8 +53,9 @@ resource "aws_iam_role_policy_attachment" "getSubscriptionStatus" {
 resource "aws_lambda_function" "getSubscriptionStatus" {
   function_name = "${local.getSubscriptionStatus_function_name}"
 
-  s3_bucket = "${var.code_bucket}"
-  s3_key    = "${var.jar_path}"
+  s3_bucket         = "${data.aws_s3_bucket_object.lambda.bucket}"
+  s3_key            = "${data.aws_s3_bucket_object.lambda.key}"
+  s3_object_version = "${data.aws_s3_bucket_object.lambda.version_id}"
 
   handler = "com.amazonaws.lambda.responsys.GetSubscriberInfoHandler::handleRequest"
   role    = "${aws_iam_role.getSubscriptionStatus.arn}"
@@ -65,11 +66,11 @@ resource "aws_lambda_function" "getSubscriptionStatus" {
 
   environment {
     variables = {
-      LOGIN_ENDPOINT        = "${local.apigw_domain_name}/login"
-      LOGIN_SECRET_KEY      = "${var.login_secretkey}"
-      LOGIN_ACCESS_KEY      = "${var.login_accesskey}"
-      LOGIN_REGION          = "${var.env_region}"
+      LOGIN_ENDPOINT        = "https://${local.apigw_domain_name}/login"
+      LOGIN_REGION          = "${data.aws_region.current.name}"
       LOGIN_SERVICE         = "execute-api"
+      LOGIN_ACCESS_KEY      = "${var.login_access_key}"
+      LOGIN_SECRET_KEY      = "${var.login_secret_key}"
       GET_MEMBER_API_URL    = "/rest/api/v1/lists/CONTACTS_LIST/members/"
       GET_FIELD_PARAMS      = "EMAIL_ADDRESS_,EMAIL_PERMISSION_STATUS_"
       IS_TRANSFORM_RESPONSE = "true"

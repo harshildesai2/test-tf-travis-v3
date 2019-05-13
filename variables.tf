@@ -14,7 +14,17 @@ variable "code_bucket" {
 
 variable "jar_path" {
   description = "Path of code JAR in S3 bucket"
-  default = "code/consentmgtapi-1.0.0.jar"
+  default = "code/consentmgtapi-1.0.1.jar"
+}
+
+variable "subscriber_queue_name" {
+  description = "Name of the FIFO queue for posting the subscription messages"
+  default = "subscriberMsgQueue"
+}
+
+variable "update_scheduler_run_period" {
+  description = "Scheduler run period in minutes. Default: 1"
+  default     = 1
 }
 
 variable "logs_retention_in_days" {
@@ -39,6 +49,23 @@ variable "certificate_domain_name" {
   description = "Domain name associated with SSL certificate to be used for API Gateway"
   default = "asdf"
 }
+
+
+variable "api_endpoint" {
+  description = "Token API endpoint"
+  default = "https://login2.responsys.net/rest/api/v1/auth/token"
+}
+
+variable "api_password" {
+  description = "Token API password"
+  default = "Lulu%40lem0n"
+}
+
+variable "api_username" {
+  description = "Token API username"
+  default = "loyalty_API"
+}
+
 
 locals {
   required_tags = {

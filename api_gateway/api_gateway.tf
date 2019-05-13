@@ -1,16 +1,38 @@
+# IAM role for sending messages to SQS
+resource "aws_iam_role" "send_subscriber_msg" {
+  name                = "${local.name_prefix}-apigw-send-msg-role"
+  assume_role_policy  = "${file("${path.module}/templates/sendMessage_role.json.tpl")}"
+}
+
+# Render the sending messages to SQS, policy from a template
+data "template_file" "send_subscriber_msg" {
+  template  = "${file("${path.module}/templates/sendMessage_role_policy.json.tpl")}"
+  vars {
+    subscriber_queue_arn = "${var.subscriber_queue_arn}"
+  }
+}
+
+# Allow APIGateway to send messages to SQS
+resource "aws_iam_role_policy" "send_subscriber_msg" {
+  name    = "${local.name_prefix}-apigw-send-msg-role-policy"
+  role    = "${aws_iam_role.send_subscriber_msg.id}"
+  policy  = "${data.template_file.send_subscriber_msg.rendered}"
+}
+
 #Parsing swagger file
 data "template_file" "swagger_template" {
   template = "${file("${path.module}/templates/swagger.json.tpl")}"
 
   vars {
-    env_name = "${var.env_name}"
-    region   = "${data.aws_region.current.name}"
-    login_invoke_arn = "${var.login_invoke_arn}"
-    getSubscriber_invoke_arn = "${var.getSubscriber_invoke_arn}"
-    getSubscriptionStatus_invoke_arn = "${var.getSubscriptionStatus_invoke_arn}"
-    updateSubscriber_invoke_arn = "${var.updateSubscriber_invoke_arn}"
-    apiexecution_user_arn = "${aws_iam_user.api_execution.arn}"
-    apiexecution_user_arn_login = "${aws_iam_user.api_execution_login.arn}"
+    env_name                          = "${var.env_name}"
+    region                            = "${data.aws_region.current.name}"
+    login_invoke_arn                  = "${var.login_invoke_arn}"
+    getSubscriber_invoke_arn          = "${var.getSubscriber_invoke_arn}"
+    getSubscriptionStatus_invoke_arn  = "${var.getSubscriptionStatus_invoke_arn}"
+    apiexecution_user_arn             = "${aws_iam_user.api_execution.arn}"
+    apiexecution_user_arn_login       = "${aws_iam_user.api_execution_login.arn}"
+    send_subscriber_msg_arn           = "${aws_iam_role.send_subscriber_msg.arn}"
+    fifo_queue_path                   = "arn:aws:apigateway:${data.aws_region.current.name}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.queue_name}"
   }
 }
 
@@ -19,8 +41,7 @@ data "aws_iam_policy_document" "consent_mgt_rest_api" {
     actions   = ["execute-api:Invoke"]
     resources = [
       "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/getsubscriberinfo",
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/getsubscriptionstatus",
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/updatesubscriberinfo"
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/getsubscriptionstatus"
     ]
     principals {
       type = "AWS"
@@ -48,7 +69,8 @@ data "aws_iam_policy_document" "consent_mgt_rest_api" {
     resources = [
       "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/getsubscriberinfo",
       "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/getsubscriptionstatus",
-      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/updatesubscriberinfo"
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/OPTIONS/sendsubscriberupdate",
+      "arn:aws:execute-api:${data.aws_region.current.name}:*:*/*/POST/sendsubscriberupdate"
     ]
   }
 }
@@ -132,15 +154,6 @@ resource "aws_lambda_permission" "apig_getSubscriptionStatus" {
   source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
 }
 
-#permission for updateSubscriber
-resource "aws_lambda_permission" "apig_updateSubscriber" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = "${var.updateSubscriber_arn}"
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
-}
-
 #iam user for executing the api 
 resource "aws_iam_user" "api_execution" {
   name = "${local.name_prefix}-apigw-user"
@@ -168,7 +181,7 @@ resource "aws_iam_user_policy_attachment" "api_execution" {
 
 #iam user for executing the api for login API 
 resource "aws_iam_user" "api_execution_login" {
-  name = "${local.name_prefix}-apigw-user-login"
+  name = "${local.name_prefix}-apigw-login-user"
   path = "/${local.name_prefix}/"
 }
 
@@ -179,7 +192,7 @@ data "template_file" "apiuser_policy_login" {
 
 #building policy document for Login API
 resource "aws_iam_policy" "api_execution_login" {
-  name = "${local.name_prefix}-apiexecution-policy-login"
+  name = "${local.name_prefix}-apiexecution-login-policy"
   description = "IAM policy for executing Consent Management API for Login resource"
   path = "/${local.name_prefix}/"
   policy = "${data.template_file.apiuser_policy_login.rendered}"
