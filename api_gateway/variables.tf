@@ -14,6 +14,10 @@ variable "getSubscriber_invoke_arn" {
   description = "aws_lambda_function.getSubscriber.invoke_"
 }
 
+variable "sendSubscriptionUpdate_invoke_arn" {
+  description = "aws_lambda_function.sendSubscriptionUpdate.invoke_"
+}
+
 variable "getSubscriptionStatus_invoke_arn" {
   description = "aws_lambda_function.getSubscriptionStatus.invoke_"
 }
@@ -24,6 +28,10 @@ variable "login_arn" {
 
 variable "getSubscriber_arn" {
   description = "aws_lambda_function.getSubscriber."
+}
+
+variable "sendSubscriptionUpdate_arn" {
+  description = "aws_lambda_function.sendSubscriptionUpdate."
 }
 
 variable "getSubscriptionStatus_arn" {
@@ -53,13 +61,17 @@ variable "api_data_trace_enabled" {
   description = "Specifies whether data trace logging is enabled for all methods, if true API Gateway pushes logs to CloudWatch. Default: false"
   default = "false"
 }
+
+variable "certificate_domain_name" {
+  description = "Domain name associated with SSL certificate to be used for API Gateway"
+}
 variable "required_tags" {
   type = "map"
   description = "Tags to apply to all resources"
 }
 
 locals {
-  apigw_domain_name = "preference.domain"
+  apigw_domain_name = "${lower(var.env_name) == "prod" ? "preference.${var.certificate_domain_name}" : "preference-${lower(var.env_name)}.${var.certificate_domain_name}"}"
   name_prefix = "${lower(var.env_name) == "prod" ? "consentmgt" : "consentmgt-${lower(var.env_name)}"}"
   required_tags = "${var.required_tags}"
 }

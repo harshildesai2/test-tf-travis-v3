@@ -3,9 +3,12 @@
   "Id": "sqspolicy",
   "Statement": [
     {
-      "Action": "SQS:SendMessage",
-      "Effect": "Allow",
-      "Principal": "*"
+		"Action": [
+        	"SQS:SendMessage",
+        	"SQS:GetQueueUrl"
+      	],
+      	"Effect": "Allow",
+      	"Principal": "*"
     }
   ]
 }

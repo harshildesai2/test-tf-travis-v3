@@ -116,8 +116,8 @@
             "default": {
               "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Methods": "'*'",
-                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
@@ -197,8 +197,8 @@
             "default": {
               "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Methods": "'*'",
-                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
@@ -232,8 +232,10 @@
           }
         ],
         "x-amazon-apigateway-integration": {
-          "credentials": "arn:aws:iam::*:*",
-          "uri": "${fifo_queue_path}",
+          "uri": "${sendSubscriptionUpdate_invoke_arn}",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
           "responses": {
             "default": {
               "statusCode": "200",
@@ -241,16 +243,7 @@
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
-          },
-          "requestParameters": {
-            "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
-          },
-          "passthroughBehavior": "when_no_match",
-          "httpMethod": "POST",
-          "requestTemplates": {
-            "application/json": "Action=SendMessage&MessageBody=$util.urlEncode($util.escapeJavaScript($input.json('$')))&MessageGroupId=\"subscribermsggroup\""
-          },
-          "type": "aws"
+          }
         }
       },
       "options": {
@@ -282,13 +275,13 @@
             "default": {
               "statusCode": "200",
               "responseParameters": {
-                "method.response.header.Access-Control-Allow-Methods": "'*'",
-                "method.response.header.Access-Control-Allow-Headers": "'*'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
                 "method.response.header.Access-Control-Allow-Origin": "'*'"
               }
             }
           },
-          "passthroughBehavior": "when_no_match",
+          "passthroughBehavior": "when_no_templates",
           "requestTemplates": {
             "application/json": "{\"statusCode\": 200}"
           },

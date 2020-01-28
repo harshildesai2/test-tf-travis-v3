@@ -73,6 +73,10 @@ variable "queue_name" {
   description = "Name of the FIFO queue that stores Subscription messages"
 }
 
+variable "queue_msg_id" {
+  description = "MessageId used for the messages sent to the FIFO queue"
+}
+
 variable "subscriber_queue_arn" {
   description = "arn for the FIFO SQS queue where subscriber messages are stored."
 }

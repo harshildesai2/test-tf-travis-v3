@@ -20,6 +20,7 @@ module "lambda" {
   
   update_scheduler_run_period = "${var.update_scheduler_run_period}"
   queue_name                  = "${var.subscriber_queue_name}-${var.env_name}.fifo"
+  queue_msg_id                = "${var.queue_msg_id}"
   
   certificate_domain_name = "${var.certificate_domain_name}"
 
@@ -35,17 +36,22 @@ module "api_gateway" {
 
   env_name   = "${lower(var.env_name)}"
 
-  login_arn = "${module.lambda.login_arn}"
-  getSubscriber_arn = "${module.lambda.getSubscriber_arn}"
-  getSubscriptionStatus_arn = "${module.lambda.getSubscriptionStatus_arn}"
-  login_invoke_arn = "${module.lambda.login_invoke_arn}"
-  getSubscriber_invoke_arn = "${module.lambda.getSubscriber_invoke_arn}"
-  getSubscriptionStatus_invoke_arn = "${module.lambda.getSubscriptionStatus_invoke_arn}"
-  subscriber_queue_arn            = "${module.queue.subscriber_queue_arn}"
-  queue_name                      = "${var.subscriber_queue_name}-${var.env_name}.fifo"
-  
+  login_arn                         = "${module.lambda.login_arn}"
+  getSubscriber_arn                 = "${module.lambda.getSubscriber_arn}"
+  getSubscriptionStatus_arn         = "${module.lambda.getSubscriptionStatus_arn}"
+  sendSubscriptionUpdate_arn        = "${module.lambda.sendSubscriptionUpdate_arn}"
+  login_invoke_arn                  = "${module.lambda.login_invoke_arn}"
+  getSubscriber_invoke_arn          = "${module.lambda.getSubscriber_invoke_arn}"
+  getSubscriptionStatus_invoke_arn  = "${module.lambda.getSubscriptionStatus_invoke_arn}"
+  sendSubscriptionUpdate_invoke_arn = "${module.lambda.sendSubscriptionUpdate_invoke_arn}"
+  subscriber_queue_arn              = "${module.queue.subscriber_queue_arn}"
+  queue_name                        = "${var.subscriber_queue_name}-${var.env_name}.fifo"
+
+  certificate_domain_name = "${var.certificate_domain_name}"  
+
   logs_retention_in_days = "14"
   kinesis_firehose_delivery_stream_name = "${var.kinesis_firehose_delivery_stream_name}"
+
   required_tags = "${local.required_tags}"
 }
 

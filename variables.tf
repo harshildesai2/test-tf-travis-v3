@@ -22,6 +22,11 @@ variable "subscriber_queue_name" {
   default = "subscriberMsgQueue"
 }
 
+variable "queue_msg_id" {
+  description = "MessageId used for the messages sent to the FIFO queue"
+  default = "subscriberMsg"
+}
+
 variable "update_scheduler_run_period" {
   description = "Scheduler run period in minutes. Default: 1"
   default     = 1
@@ -69,8 +74,8 @@ variable "api_username" {
 
 locals {
   required_tags = {
+    "lll:deployment:environment"    = "${var.env_tag == "" ? lower(var.env_name) : lower(var.env_tag)}"
     "lll:deployment:terraform"      = "True"
     "lll:business:application-name" = "Consent Management"
-    "lll:deployment:environment"    = "${var.env_tag == "" ? lower(var.env_name) : lower(var.env_tag)}"
   }
 }

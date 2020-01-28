@@ -63,7 +63,7 @@ resource "aws_lambda_function" "processSubscriberUpdateScheduler" {
 
   runtime     = "java8"
   memory_size = "512"
-  timeout     = "15"
+  timeout     = "75"
 
   environment {
     variables = {

@@ -13,6 +13,7 @@ resource "aws_api_gateway_usage_plan" "api_usage_plan" {
   }
 }
 
+#creating key for the desktop web client
 resource "aws_api_gateway_api_key" "webkey" {
   name = "${local.name_prefix}-web-key"
 }
@@ -22,6 +23,40 @@ resource "aws_api_gateway_usage_plan_key" "webkey_plan" {
   key_type      = "API_KEY"
   usage_plan_id = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
 }
+
+#creating key for the AB Testing team client modal interface
+resource "aws_api_gateway_api_key" "abteamkey" {
+  name = "${local.name_prefix}-abteam-key"
+}
+
+resource "aws_api_gateway_usage_plan_key" "abteamkey_plan" {
+  key_id        = "${aws_api_gateway_api_key.abteamkey.id}"
+  key_type      = "API_KEY"
+  usage_plan_id = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
+}
+
+#creating key for the CnE team
+resource "aws_api_gateway_api_key" "cneteamkey" {
+  name = "${local.name_prefix}-cneteam-key"
+}
+
+resource "aws_api_gateway_usage_plan_key" "cneteamkey_plan" {
+  key_id        = "${aws_api_gateway_api_key.cneteamkey.id}"
+  key_type      = "API_KEY"
+  usage_plan_id = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
+}
+
+#creating an additional key for future client
+resource "aws_api_gateway_api_key" "team1key" {
+  name = "${local.name_prefix}-team1-key"
+}
+
+resource "aws_api_gateway_usage_plan_key" "team1key_plan" {
+  key_id        = "${aws_api_gateway_api_key.team1key.id}"
+  key_type      = "API_KEY"
+  usage_plan_id = "${aws_api_gateway_usage_plan.api_usage_plan.id}"
+}
+
 
 #installing CLI using the linux script
 data "template_file" "install_script" {

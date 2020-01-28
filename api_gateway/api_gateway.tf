@@ -1,23 +1,3 @@
-# IAM role for sending messages to SQS
-resource "aws_iam_role" "send_subscriber_msg" {
-  name                = "${local.name_prefix}-apigw-send-msg-role"
-  assume_role_policy  = "${file("${path.module}/templates/sendMessage_role.json.tpl")}"
-}
-
-# Render the sending messages to SQS, policy from a template
-data "template_file" "send_subscriber_msg" {
-  template  = "${file("${path.module}/templates/sendMessage_role_policy.json.tpl")}"
-  vars {
-    subscriber_queue_arn = "${var.subscriber_queue_arn}"
-  }
-}
-
-# Allow APIGateway to send messages to SQS
-resource "aws_iam_role_policy" "send_subscriber_msg" {
-  name    = "${local.name_prefix}-apigw-send-msg-role-policy"
-  role    = "${aws_iam_role.send_subscriber_msg.id}"
-  policy  = "${data.template_file.send_subscriber_msg.rendered}"
-}
 
 #Parsing swagger file
 data "template_file" "swagger_template" {
@@ -29,9 +9,9 @@ data "template_file" "swagger_template" {
     login_invoke_arn                  = "${var.login_invoke_arn}"
     getSubscriber_invoke_arn          = "${var.getSubscriber_invoke_arn}"
     getSubscriptionStatus_invoke_arn  = "${var.getSubscriptionStatus_invoke_arn}"
+    sendSubscriptionUpdate_invoke_arn = "${var.sendSubscriptionUpdate_invoke_arn}"
     apiexecution_user_arn             = "${aws_iam_user.api_execution.arn}"
     apiexecution_user_arn_login       = "${aws_iam_user.api_execution_login.arn}"
-    send_subscriber_msg_arn           = "${aws_iam_role.send_subscriber_msg.arn}"
     fifo_queue_path                   = "arn:aws:apigateway:${data.aws_region.current.name}:sqs:path/${data.aws_caller_identity.current.account_id}/${var.queue_name}"
   }
 }
@@ -136,7 +116,7 @@ resource "aws_lambda_permission" "apig_login" {
   source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
 }
 
-#permission for getSubscriber apigateway
+#permission for getSubscriber apigateway resource
 resource "aws_lambda_permission" "apig_getSubscriber" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -145,11 +125,20 @@ resource "aws_lambda_permission" "apig_getSubscriber" {
   source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
 }
 
-#permission for getSubscriptionStatus apigateway
+#permission for getSubscriptionStatus apigateway resource
 resource "aws_lambda_permission" "apig_getSubscriptionStatus" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = "${var.getSubscriptionStatus_arn}"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
+}
+
+#permission for sendSubscriptionUpdate apigateway resource
+resource "aws_lambda_permission" "apig_sendSubscriptionUpdate" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = "${var.sendSubscriptionUpdate_arn}"
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.consent_mgt.execution_arn}/*/*"
 }

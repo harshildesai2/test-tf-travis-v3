@@ -10,6 +10,10 @@ output "getSubscriptionStatus_invoke_arn" {
   value = "${aws_lambda_function.getSubscriptionStatus.invoke_arn}"
 }
 
+output "sendSubscriptionUpdate_invoke_arn" {
+  value = "${aws_lambda_function.sendSubscriptionUpdate.invoke_arn}"
+}
+
 output "login_arn" {
   value = "${aws_lambda_function.login.arn}"
 }
@@ -20,4 +24,8 @@ output "getSubscriber_arn" {
 
 output "getSubscriptionStatus_arn" {
   value = "${aws_lambda_function.getSubscriptionStatus.arn}"
+}
+
+output "sendSubscriptionUpdate_arn" {	
+  value = "${aws_lambda_function.sendSubscriptionUpdate.arn}"	
 }
