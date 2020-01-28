@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "consent-management-${env_name}",
-    "version": "2019-01-11T23:09:00Z"
+    "description": "Consent management responsys API"
   },
   "servers": [
     {
@@ -15,11 +15,61 @@
     }
   ],
   "paths": {
-    "/getsubscriberinfo": {
+    "/login": {
       "post": {
         "security": [
           {
             "sigv4": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "uri": "${login_invoke_arn}",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          }
+        }
+      },
+      "options": {
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/getsubscriberinfo": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "security": [
+          {
+            "sigv4": []
+          },
+          {
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
@@ -29,17 +79,78 @@
           "type": "aws_proxy",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
           }
+        }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
         }
       }
     },
     "/getsubscriptionstatus": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
         "security": [
           {
             "sigv4": []
+          },
+          {
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
@@ -49,35 +160,143 @@
           "type": "aws_proxy",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
           }
         }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
+        }
       }
     },
-    "/updatesubscriberinfo": {
+    "/sendsubscriberupdate": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
         "security": [
           {
-            "sigv4": []
+            "api_key": []
           }
         ],
         "x-amazon-apigateway-integration": {
-          "uri": "${updateSubscriber_invoke_arn}",
+          "uri": "${sendSubscriptionUpdate_invoke_arn}",
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "type": "aws_proxy",
           "responses": {
             "default": {
-              "statusCode": "200"
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
             }
           }
+        }
+      },
+      "options": {
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {}
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              }
+            }
+          },
+          "passthroughBehavior": "when_no_templates",
+          "requestTemplates": {
+            "application/json": "{\"statusCode\": 200}"
+          },
+          "type": "mock"
         }
       }
     }
   },
   "components": {
     "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header"
+      },
       "sigv4": {
         "type": "apiKey",
         "name": "Authorization",
@@ -96,9 +315,27 @@
         },
         "Action": "execute-api:Invoke",
         "Resource": [
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/getsubscriberinfo",
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/getsubscriptionstatus",
-          "arn:aws:execute-api:us-east-1:*:*/*/POST/updatesubscriberinfo"
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriberinfo",
+          "arn:aws:execute-api:${region}:*:*/*/POST/getsubscriptionstatus"
+        ]
+      },
+      {
+          "Effect": "Allow",
+          "Principal": {
+              "AWS": "${apiexecution_user_arn_login}"
+          },
+          "Action": "execute-api:*",
+          "Resource": "arn:aws:execute-api:${region}:*:*/*/POST/login"
+      },
+      {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "execute-api:*",
+        "Resource": [
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriberinfo",
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/getsubscriptionstatus",
+          "arn:aws:execute-api:${region}:*:*/*/OPTIONS/sendsubscriberupdate",
+          "arn:aws:execute-api:${region}:*:*/*/POST/sendsubscriberupdate"
         ]
       }
     ]
