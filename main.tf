@@ -48,8 +48,9 @@ module "api_gateway" {
   queue_name                        = "${var.subscriber_queue_name}-${var.env_name}.fifo"
 
   certificate_domain_name = "${var.certificate_domain_name}"  
+  route53_assume_role_arn = "${var.route53_assume_role_arn}"
 
-  logs_retention_in_days = "14"
+  logs_retention_in_days = "${var.logs_retention_in_days}"
   kinesis_firehose_delivery_stream_name = "${var.kinesis_firehose_delivery_stream_name}"
 
   required_tags = "${local.required_tags}"

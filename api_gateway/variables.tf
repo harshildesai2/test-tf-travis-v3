@@ -65,6 +65,10 @@ variable "api_data_trace_enabled" {
 variable "certificate_domain_name" {
   description = "Domain name associated with SSL certificate to be used for API Gateway"
 }
+variable "route53_assume_role_arn" {
+  description = "IAM role to assume when working with Route53 resources. Default: empty (do not assume role)"
+  default = ""
+}
 variable "required_tags" {
   type = "map"
   description = "Tags to apply to all resources"

@@ -55,6 +55,30 @@ variable "certificate_domain_name" {
   default = "asdf"
 }
 
+variable "route53_assume_role_arn" {
+  description = "IAM role to assume when working with Route53 resources. Default: empty (do not assume role)"
+  default = ""
+}
+
+variable "department" {
+  description = "Department tag"
+  default = "test"
+}
+
+variable "project_name" {
+  description = "Project name tag"
+  default = "test"
+}
+
+variable "project_code" {
+  description = "Project code tag"
+  default = "test"
+}
+
+variable "cost_center" {
+  description = "Cost center tag"
+  default = "test"
+}
 
 variable "api_endpoint" {
   description = "Token API endpoint"
@@ -71,11 +95,20 @@ variable "api_username" {
   default = "loyalty_API"
 }
 
+variable "tfe_workspace" {
+  description = "Name of TFE workspace"
+  default = "test"
+}
 
 locals {
   required_tags = {
     "lll:deployment:environment"    = "${var.env_tag == "" ? lower(var.env_name) : lower(var.env_tag)}"
     "lll:deployment:terraform"      = "True"
+    "lll:deployment:tfe-workspace"  = "${var.tfe_workspace}"
     "lll:business:application-name" = "Consent Management"
+    "lll:business:cost-center"      = "${var.cost_center}"
+    "lll:business:department"       = "${var.department}"
+    "lll:business:project-name"     = "${var.project_name}"
+    "lll:business:project-code"     = "${var.project_code}"
   }
 }
